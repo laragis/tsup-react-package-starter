@@ -10,7 +10,8 @@
     "url": ""
   },
   "scripts": {
-    "dev": "concurrently \"yarn build --watch\" \"yarn storybook\" \"yarn test\" ",
+    "dev": "concurrently \"tsup --watch\" \"yarn storybook\"",
+    "dev:push": "concurrently --kill-others \"tsup --watch\" \"yarn yalc:watch-push\"",
     "build": "tsup --onSuccess \"yarn link:self\"",
     "type-check": "tsc",
     "lint": "eslint --ignore-path .gitignore \"{src,tests}/**/*.+(ts|js|tsx)\"",
@@ -23,32 +24,18 @@
     "build-storybook": "storybook build",
     "deploy-storybook": "storybook-to-ghpages",
     "release": "yarn build && yarn release-it",
-    "link:self": "yarn yalc publish && yarn link"
-  },
-  "tsup": {
-    "entry": [
-      "src/index.ts"
-    ],
-    "treeshake": true,
-    "sourcemap": "inline",
-    "minify": true,
-    "clean": true,
-    "dts": true,
-    "splitting": false,
-    "format": [
-      "cjs",
-      "esm"
-    ],
-    "external": [
-      "react"
-    ],
-    "injectStyle": false
+    "link:self": "yarn yalc publish && yarn link",
+    "yalc:watch-push": "nodemon -e js --watch dist --delay 500ms --exec yalc push --changed"
   },
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
       "require": "./dist/index.js",
       "import": "./dist/index.mjs"
+    },
+    "./dist/index.css": {
+      "import": "./dist/index.css",
+      "require": "./dist/index.css"
     }
   },
   "files": [
@@ -124,12 +111,14 @@
     "husky": "8.0.3",
     "jsdom": "^22.1.0",
     "lint-staged": "15.0.2",
+    "nodemon": "^3.0.1",
     "prettier": "3.0.3",
     "prop-types": "15.8.1",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-test-renderer": "18.2.0",
     "release-it": "16.2.1",
+    "rimraf": "^5.0.5",
     "storybook": "7.5.2",
     "tsup": "7.2.0",
     "typescript": "5.2.2",
